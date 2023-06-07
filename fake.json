@@ -1,0 +1,132 @@
+[
+  {
+    "image": "https://s6.imgcdn.dev/vjXmC.jpg",
+    "className": "Beginner Spanish",
+    "instructorName": "Maria Sanchez",
+    "instructorEmail": "maria.sanchez@gmail.com",
+    "instructorImage": "https://s6.imgcdn.dev/vjEce.webp",
+    "availableSeats": 20,
+    "coursePrice": 100,
+    "totalStudents": 250
+  },
+  {
+    "image": "https://s6.imgcdn.dev/vj8a0.jpg",
+    "className": "Intermediate French",
+    "instructorName": "Jean-Pierre Martin",
+    "instructorEmail": "jeanpierre.martin@example.com",
+    "instructorImage": "https://s6.imgcdn.dev/vjJWM.jpg",
+    "availableSeats": 18,
+    "coursePrice": 120,
+    "totalStudents": 400
+  },
+  {
+    "image": "https://s6.imgcdn.dev/vjpYd.jpg",
+    "className": "Advanced German",
+    "instructorName": "Hans Schmidt",
+    "instructorEmail": "hans.schmidt@example.com",
+    "instructorImage": "https://s6.imgcdn.dev/vwDKl.jpg",
+    "availableSeats": 15,
+    "coursePrice": 150,
+    "totalStudents": 150
+  },
+  {
+    "image": "https://s6.imgcdn.dev/vwYZh.jpg",
+    "className": "Elementary Chinese",
+    "instructorName": "Li Wei",
+    "instructorEmail": "li.wei@example.com",
+    "instructorImage": "https://s6.imgcdn.dev/vwhEV.jpg",
+    "availableSeats": 25,
+    "coursePrice": 80,
+    "totalStudents": 300
+  },
+  {
+    "image": "https://s6.imgcdn.dev/vwwiK.jpg",
+    "className": "Intermediate Italian",
+    "instructorName": "Giulia Rossi",
+    "instructorEmail": "giulia.rossi@example.com",
+    "instructorImage": "https://s6.imgcdn.dev/vw6So.jpg",
+    "availableSeats": 20,
+    "coursePrice": 110,
+    "totalStudents": 200
+  },
+  {
+    "image": "https://s6.imgcdn.dev/vwMmO.jpg",
+    "className": "Advanced Japanese",
+    "instructorName": "Yuki Nakamura",
+    "instructorEmail": "yuki.nakamura@example.com",
+    "instructorImage": "https://s6.imgcdn.dev/vwuun.jpg",
+    "availableSeats": 15,
+    "coursePrice": 160,
+    "totalStudents": 550
+  },
+  {
+    "image": "https://s6.imgcdn.dev/vwNhN.png",
+    "className": "Beginner Russian",
+    "instructorName": "Ivan Petrov",
+    "instructorEmail": "ivan.petrov@example.com",
+    "instructorImage": "https://s6.imgcdn.dev/vwQKq.jpg",
+    "availableSeats": 18,
+    "coursePrice": 100,
+    "totalStudents": 120
+  },
+  {
+    "image": "https://s6.imgcdn.dev/vw4ag.jpg",
+    "className": "Intermediate Portuguese",
+    "instructorName": "Luiza Silva",
+    "instructorEmail": "luiza.silva@example.com",
+    "instructorImage": "https://s6.imgcdn.dev/vwCWv.jpg",
+    "availableSeats": 20,
+    "coursePrice": 130,
+    "totalStudents": 350
+  },
+  {
+    "image": "https://s6.imgcdn.dev/vwsiL.jpg",
+    "className": "Advanced Arabic",
+    "instructorName": "Ahmed Khalid",
+    "instructorEmail": "ahmed.khalid@example.com",
+    "instructorImage": "https://s6.imgcdn.dev/vwyra.jpg",
+    "availableSeats": 15,
+    "coursePrice": 150,
+    "totalStudents": 180
+  },
+  {
+    "image": "https://s6.imgcdn.dev/vw5qw.jpg",
+    "className": "Beginner Korean",
+    "instructorName": "Ji-hyun Lee",
+    "instructorEmail": "jihyun.lee@example.com",
+    "instructorImage": "https://s6.imgcdn.dev/vwT1T.jpg",
+    "availableSeats": 20,
+    "coursePrice": 90,
+    "totalStudents": 500
+  },
+  {
+    "image": "https://s6.imgcdn.dev/vwiZB.jpg",
+    "className": "Intermediate Dutch",
+    "instructorName": "Pieter van der Berg",
+    "instructorEmail": "pieter.vanderberg@example.com",
+    "instructorImage": "https://s6.imgcdn.dev/vwk8u.jpg",
+    "availableSeats": 18,
+    "coursePrice": 120,
+    "totalStudents": 250
+  },
+  {
+    "image": "https://s6.imgcdn.dev/vwzh9.jpg",
+    "className": "Intermediate Spanish",
+    "instructorName": "Carlos Rodriguez",
+    "instructorEmail": "carlos.rodriguez@example.com",
+    "instructorImage": "https://s6.imgcdn.dev/vwUdD.jpg",
+    "availableSeats": 18,
+    "coursePrice": 110,
+    "totalStudents": 350
+  },
+  {
+    "image": "https://s6.imgcdn.dev/vwaPy.jpg",
+    "className": "Advanced French",
+    "instructorName": "Isabelle Dupont",
+    "instructorEmail": "isabelle.dupont@example.com",
+    "instructorImage": "https://s6.imgcdn.dev/vw1Z8.jpg",
+    "availableSeats": 15,
+    "coursePrice": 160,
+    "totalStudents": 230
+  }
+]
