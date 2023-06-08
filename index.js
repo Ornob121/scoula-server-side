@@ -64,7 +64,10 @@ async function run() {
       console.log(id);
       const filter = { _id: new ObjectId(id) };
       const result = await instructorCollection.findOne(filter);
-      res.send(result);
+      const emailFilter = { instructorEmail: result.instructorEmail };
+      const classesResult = await courseCollection.find(emailFilter).toArray();
+      console.log(classesResult);
+      res.send({ result, classesResult });
     });
 
     app.get("/instructors/:email", async (req, res) => {
