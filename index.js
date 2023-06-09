@@ -11,6 +11,30 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const verifyJWT = (req, res, next) => {
+  const authorization = req.headers.authorization;
+  console.log(authorization);
+  if (!authorization) {
+    // console.log("authorization error");
+    return res
+      .status(401)
+      .send({ error: true, message: "Unauthorized Access" });
+  }
+  const token = authorization.split(" ")[1];
+  if (token) {
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, decoded) => {
+      if (error) {
+        // console.log(error, "This is error");
+        return res
+          .status(403)
+          .send({ error: true, message: "Unauthorized Access" });
+      }
+      req.decoded = decoded;
+      next();
+    });
+  }
+};
+
 app.get("/", (req, res) => {
   res.send("The Scuola server is running");
 });
@@ -37,6 +61,18 @@ async function run() {
       .db("scuolaDB")
       .collection("instructors");
     const userCollection = client.db("scuolaDB").collection("users");
+    const selectedClassCollection = client
+      .db("scuolaDB")
+      .collection("selectedClasses");
+
+    // ! JWT Token
+    app.post("/jwt", (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "1hr",
+      });
+      res.send({ token });
+    });
 
     // ! Courses APIs
     app.get("/popularCourses", async (req, res) => {
@@ -99,6 +135,33 @@ async function run() {
         res.send(result);
       }
     });
+
+    // ! Selected Class APIs
+
+    app.post("/selectedClasses", async (req, res) => {
+      const selectedClass = req.body;
+      const result = await selectedClassCollection.insertOne(selectedClass);
+      res.send(result);
+    });
+
+    app.get("/selectedClasses", verifyJWT, async (req, res) => {
+      const email = req.query.email;
+      console.log(email);
+
+      if (!email) {
+        // console.log("Email not found");
+        res.send([]);
+      }
+
+      if (req.decoded.email !== email) {
+        // console.log("error 405");
+        return res.status(401).send({ error: true, message: "Unauthorized" });
+      }
+      const filter = { email: email };
+      const result = await selectedClassCollection.find(filter).toArray();
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
