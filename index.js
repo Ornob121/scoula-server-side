@@ -36,6 +36,7 @@ async function run() {
     const instructorCollection = client
       .db("scuolaDB")
       .collection("instructors");
+    const userCollection = client.db("scuolaDB").collection("users");
 
     // ! Courses APIs
     app.get("/popularCourses", async (req, res) => {
@@ -59,6 +60,16 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/popularInstructors", async (req, res) => {
+      const result = await instructorCollection
+        .find()
+        .sort({ totalStudents: -1 })
+        .limit(6)
+        .toArray();
+
+      res.send(result);
+    });
+
     app.get("/instructors/:id", async (req, res) => {
       const id = req.params.id;
       console.log(id);
@@ -78,6 +89,16 @@ async function run() {
       res.send(result);
     });
 
+    // ! User APIs
+
+    app.post("/users", async (req, res) => {
+      const newUser = req.body;
+      const isOldUser = await userCollection.findOne({ email: newUser.email });
+      if (!isOldUser) {
+        const result = await userCollection.insertOne(newUser);
+        res.send(result);
+      }
+    });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
