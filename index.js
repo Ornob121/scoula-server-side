@@ -13,7 +13,7 @@ app.use(express.json());
 
 const verifyJWT = (req, res, next) => {
   const authorization = req.headers.authorization;
-  console.log(authorization);
+  // console.log(authorization);
   if (!authorization) {
     // console.log("authorization error");
     return res
@@ -74,6 +74,19 @@ async function run() {
       res.send({ token });
     });
 
+    // ! Verify Admin
+    const verifyAdmin = async (req, res, next) => {
+      const email = req.decoded.email;
+      const filter = { email: email };
+      const user = await userCollection.findOne(filter);
+      if (user?.role !== "admin") {
+        return res
+          .status(401)
+          .send({ error: true, message: "forbidden access" });
+      }
+      next();
+    };
+
     // ! Courses APIs
     app.get("/popularCourses", async (req, res) => {
       const result = await courseCollection
@@ -108,18 +121,18 @@ async function run() {
 
     app.get("/instructors/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
+      // console.log(id);
       const filter = { _id: new ObjectId(id) };
       const result = await instructorCollection.findOne(filter);
       const emailFilter = { instructorEmail: result.instructorEmail };
       const classesResult = await courseCollection.find(emailFilter).toArray();
-      console.log(classesResult);
+      // console.log(classesResult);
       res.send({ result, classesResult });
     });
 
     app.get("/instructors/:email", async (req, res) => {
       const email = req.params.email;
-      console.log(email);
+      // console.log(email);
       const filter = { instructorEmail: email };
       const result = await courseCollection.find(filter).toArray();
       res.send(result);
@@ -136,6 +149,35 @@ async function run() {
       }
     });
 
+    app.get("/users/admin", verifyJWT, verifyAdmin, async (req, res) => {
+      const result = await userCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/users/admin/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      if (req.decoded.email !== email) {
+        return res.send({ admin: false });
+      }
+      const filter = { email: email };
+      const user = await userCollection.findOne(filter);
+      const result = { admin: user?.role === "admin" };
+      res.send(result);
+    });
+
+    app.patch("/users/admin/:id", async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const filter = { _id: new ObjectId(id) };
+      const update = {
+        $set: {
+          role: "admin",
+        },
+      };
+      const result = await userCollection.updateOne(filter, update);
+      res.send(result);
+    });
+
     // ! Selected Class APIs
 
     app.post("/selectedClasses", async (req, res) => {
@@ -146,7 +188,7 @@ async function run() {
 
     app.get("/selectedClasses", verifyJWT, async (req, res) => {
       const email = req.query.email;
-      console.log(email);
+      // console.log(email);
 
       if (!email) {
         // console.log("Email not found");
