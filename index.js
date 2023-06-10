@@ -89,8 +89,9 @@ async function run() {
 
     // ! Courses APIs
     app.get("/popularCourses", async (req, res) => {
+      const filter = { status: "approved" };
       const result = await courseCollection
-        .find()
+        .find(filter)
         .sort({ totalStudents: -1 })
         .limit(6)
         .toArray();
@@ -98,7 +99,22 @@ async function run() {
     });
 
     app.get("/courses", async (req, res) => {
-      const result = await courseCollection.find().toArray();
+      const filter = { status: "approved" };
+      const result = await courseCollection.find(filter).toArray();
+      res.send(result);
+    });
+
+    app.post("/courses/instructors", verifyJWT, async (req, res) => {
+      const course = req.body;
+      console.log(course);
+      const result = await courseCollection.insertOne(course);
+      res.send(result);
+    });
+
+    app.get("/courses/instructors", verifyJWT, async (req, res) => {
+      const email = req.query.email;
+      const filter = { instructorEmail: email };
+      const result = await courseCollection.find(filter).toArray();
       res.send(result);
     });
 
@@ -210,6 +226,14 @@ async function run() {
       const result = await selectedClassCollection.deleteOne(filter);
       res.send(result);
     });
+
+    // ! Instructors APIs
+    // app.post("/user/instructor", async (req, res) => {
+    //   const filter = { role: "teacher" };
+    //   const user = await userCollection.find(filter);
+    //   const result = await instructorCollection.insertMany(user);
+    //   res.send(result);
+    // });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
