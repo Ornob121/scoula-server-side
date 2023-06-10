@@ -104,17 +104,32 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/allCourses/admin", verifyJWT, verifyAdmin, async (req, res) => {
+      const result = await courseCollection.find().toArray();
+      res.send(result);
+    });
+
     app.post("/courses/instructors", verifyJWT, async (req, res) => {
       const course = req.body;
-      console.log(course);
+      // console.log(course);
       const result = await courseCollection.insertOne(course);
       res.send(result);
     });
 
     app.get("/courses/instructors", verifyJWT, async (req, res) => {
       const email = req.query.email;
+      if (req.decoded.email !== email) {
+        res.status(401).send({ error: true, message: "unauthorized" });
+      }
       const filter = { instructorEmail: email };
       const result = await courseCollection.find(filter).toArray();
+      res.send(result);
+    });
+
+    app.delete("/courses/instructors/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const result = await courseCollection.deleteOne(filter);
       res.send(result);
     });
 
@@ -183,7 +198,7 @@ async function run() {
 
     app.patch("/users/admin/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
+      // console.log(id);
       const filter = { _id: new ObjectId(id) };
       const update = {
         $set: {
