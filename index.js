@@ -283,9 +283,8 @@ async function run() {
       res.send(result);
     });
 
-    app.patch("/users/admin/:id", async (req, res) => {
+    app.patch("/users/admin/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
-      // console.log(id);
       const filter = { _id: new ObjectId(id) };
       const update = {
         $set: {
@@ -293,6 +292,30 @@ async function run() {
         },
       };
       const result = await userCollection.updateOne(filter, update);
+      res.send(result);
+    });
+
+    app.patch(
+      "/users/admin/instructor/:id",
+      verifyJWT,
+      verifyAdmin,
+      async (req, res) => {
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) };
+        const update = {
+          $set: {
+            role: "teacher",
+          },
+        };
+        const result = await userCollection.updateOne(filter, update);
+        res.send(result);
+      }
+    );
+
+    app.delete("/users/admin/delete/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const result = await userCollection.deleteOne(filter);
       res.send(result);
     });
 
@@ -330,12 +353,6 @@ async function run() {
     });
 
     // ! Instructors APIs
-    // app.post("/user/instructor", async (req, res) => {
-    //   const filter = { role: "teacher" };
-    //   const user = await userCollection.find(filter);
-    //   const result = await instructorCollection.insertMany(user);
-    //   res.send(result);
-    // });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
