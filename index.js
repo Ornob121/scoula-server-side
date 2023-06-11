@@ -129,6 +129,32 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/courses/instructors/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const result = await courseCollection.findOne(filter);
+      res.send(result);
+    });
+
+    app.patch("/courses/instructors/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updatedCourse = req.body;
+      const update = {
+        $set: {
+          courseName: updatedCourse.courseName,
+          image: updatedCourse.image,
+          instructorName: updatedCourse.instructorName,
+          instructorEmail: updatedCourse.instructorEmail,
+          status: updatedCourse.status,
+          availableSeats: updatedCourse.availableSeats,
+          coursePrice: updatedCourse.coursePrice,
+        },
+      };
+      const result = await courseCollection.updateMany(filter, update);
+      res.send(result);
+    });
+
     // ! Approve Class
     app.patch(
       "/courses/admin/approve/:id",
