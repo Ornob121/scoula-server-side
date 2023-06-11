@@ -1,9 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-require("dotenv").config();
-
 const port = process.env.PORT || 5000;
+require("dotenv").config();
+const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
+
 const app = express();
 
 // ! Middleware
@@ -59,6 +60,7 @@ async function run() {
     const courseCollection = client.db("scuolaDB").collection("courses");
 
     const userCollection = client.db("scuolaDB").collection("users");
+    const paymentCollection = client.db("scuolaDB").collection("payments");
     const selectedClassCollection = client
       .db("scuolaDB")
       .collection("selectedClasses");
@@ -352,7 +354,63 @@ async function run() {
       res.send(result);
     });
 
-    // ! Instructors APIs
+    // ! Payment APIs
+
+    app.post("/create_payment_intent", verifyJWT, async (req, res) => {
+      const { price } = req.body;
+      const amount = price * 100;
+      console.log(amount, price);
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "usd",
+        payment_method_types: ["card"],
+      });
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      });
+    });
+
+    app.post("/payments", verifyJWT, async (req, res) => {
+      const payment = req.body;
+      const insertResult = await paymentCollection.insertOne(payment);
+      const filter = {
+        _id: { $in: payment.selectedCourseId.map((id) => new ObjectId(id)) },
+      };
+
+      const courseId = payment.courseId.map((item) => item);
+      const query = { _id: { $in: courseId.map((id) => new ObjectId(id)) } };
+
+      const update = {
+        $inc: {
+          availableSeats: -1,
+          totalStudents: 1,
+        },
+      };
+      const enrolledCourse = await courseCollection.updateMany(query, update);
+
+      const deleteCourse = await selectedClassCollection.deleteMany(filter);
+      res.send({ insertResult, deleteCourse });
+    });
+
+    app.get("/payments/classes", verifyJWT, async (req, res) => {
+      const email = req.query.email;
+
+      if (email !== req.decoded.email) {
+        res.send([]);
+      }
+      const filter = { buyerEmail: email };
+
+      const paymentItems = await paymentCollection.find(filter).toArray();
+
+      const items = paymentItems.map((item) => item.courseId);
+      const ids = items.flat();
+      console.log(ids);
+
+      const query = { _id: { $in: ids.map((id) => new ObjectId(id)) } };
+      const result = await courseCollection.find(query).toArray();
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
