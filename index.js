@@ -57,9 +57,7 @@ async function run() {
     await client.connect();
 
     const courseCollection = client.db("scuolaDB").collection("courses");
-    const instructorCollection = client
-      .db("scuolaDB")
-      .collection("instructors");
+
     const userCollection = client.db("scuolaDB").collection("users");
     const selectedClassCollection = client
       .db("scuolaDB")
@@ -223,13 +221,15 @@ async function run() {
     // ! Instructor APIs
 
     app.get("/instructors", async (req, res) => {
-      const result = await instructorCollection.find().toArray();
+      const filter = { role: "teacher" };
+      const result = await userCollection.find(filter).toArray();
       res.send(result);
     });
 
     app.get("/popularInstructors", async (req, res) => {
-      const result = await instructorCollection
-        .find()
+      const filter = { role: "teacher" };
+      const result = await userCollection
+        .find(filter)
         .sort({ totalStudents: -1 })
         .limit(6)
         .toArray();
@@ -241,8 +241,8 @@ async function run() {
       const id = req.params.id;
       // console.log(id);
       const filter = { _id: new ObjectId(id) };
-      const result = await instructorCollection.findOne(filter);
-      const emailFilter = { instructorEmail: result.instructorEmail };
+      const result = await userCollection.findOne(filter);
+      const emailFilter = { instructorEmail: result.email };
       const classesResult = await courseCollection.find(emailFilter).toArray();
       // console.log(classesResult);
       res.send({ result, classesResult });
