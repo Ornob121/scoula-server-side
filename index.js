@@ -105,7 +105,10 @@ async function run() {
     });
 
     app.get("/allCourses/admin", verifyJWT, verifyAdmin, async (req, res) => {
-      const result = await courseCollection.find().toArray();
+      const result = await courseCollection
+        .find()
+        .sort({ status: -1 })
+        .toArray();
       res.send(result);
     });
 
@@ -125,6 +128,64 @@ async function run() {
       const result = await courseCollection.find(filter).toArray();
       res.send(result);
     });
+
+    // ! Approve Class
+    app.patch(
+      "/courses/admin/approve/:id",
+      verifyJWT,
+      verifyAdmin,
+      async (req, res) => {
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) };
+        const update = {
+          $set: {
+            status: "approved",
+          },
+        };
+        const result = await courseCollection.updateOne(filter, update);
+        res.send(result);
+      }
+    );
+
+    // ! Deny Class
+    app.patch(
+      "/courses/admin/deny/:id",
+      verifyJWT,
+      verifyAdmin,
+      async (req, res) => {
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) };
+        const update = {
+          $set: {
+            status: "denied",
+          },
+        };
+        const result = await courseCollection.updateOne(filter, update);
+        res.send(result);
+      }
+    );
+    app.put(
+      "/courses/admin/feedback/:id",
+      verifyJWT,
+      verifyAdmin,
+      async (req, res) => {
+        const id = req.params.id;
+        const feedback = req.body;
+        const filter = { _id: new ObjectId(id) };
+        const update = {
+          $set: {
+            feedback: feedback.feedback,
+          },
+        };
+        const options = { upsert: true };
+        const result = await courseCollection.updateOne(
+          filter,
+          update,
+          options
+        );
+        res.send(result);
+      }
+    );
 
     app.delete("/courses/instructors/:id", async (req, res) => {
       const id = req.params.id;
