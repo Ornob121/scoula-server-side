@@ -87,6 +87,17 @@ async function run() {
       next();
     };
 
+    // ! Verify Teacher
+    const verifyTeacher = async (req, res, next) => {
+      const email = req.decoded.email;
+      const filter = { email: email };
+      const user = await userCollection.findOne(filter);
+      if (user?.role !== "teacher") {
+        return res.status(401).send({ error: true, message: "forbidden" });
+      }
+      next();
+    };
+
     // ! Courses APIs
     app.get("/popularCourses", async (req, res) => {
       const filter = { status: "approved" };
@@ -285,6 +296,17 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/users/teacher/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      if (email !== req.decoded.email) {
+        return res.send({ teacher: false });
+      }
+      const filter = { email: email };
+      const user = await userCollection.findOne(filter);
+      const result = { teacher: user?.role === "teacher" };
+      res.send(result);
+    });
+
     app.patch("/users/admin/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
@@ -347,6 +369,13 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/selectedClasses/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const result = await selectedClassCollection.findOne(filter);
+      res.send(result);
+    });
+
     app.delete("/selectedClasses/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
@@ -359,7 +388,7 @@ async function run() {
     app.post("/create_payment_intent", verifyJWT, async (req, res) => {
       const { price } = req.body;
       const amount = price * 100;
-      console.log(amount, price);
+      // console.log(amount, price);
 
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
@@ -405,10 +434,26 @@ async function run() {
 
       const items = paymentItems.map((item) => item.courseId);
       const ids = items.flat();
-      console.log(ids);
+      // console.log(ids);
 
       const query = { _id: { $in: ids.map((id) => new ObjectId(id)) } };
       const result = await courseCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.get("/payments", verifyJWT, async (req, res) => {
+      const email = req.query.email;
+      // console.log(email);
+
+      if (email !== req.decoded.email) {
+        res.send([]);
+      }
+
+      const filter = { buyerEmail: email };
+      const result = await paymentCollection
+        .find(filter)
+        .sort({ paymentTime: -1 })
+        .toArray();
       res.send(result);
     });
 
