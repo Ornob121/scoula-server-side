@@ -61,6 +61,7 @@ async function run() {
 
     const userCollection = client.db("scuolaDB").collection("users");
     const paymentCollection = client.db("scuolaDB").collection("payments");
+    const reviewCollection = client.db("scuolaDB").collection("reviews");
     const selectedClassCollection = client
       .db("scuolaDB")
       .collection("selectedClasses");
@@ -454,6 +455,12 @@ async function run() {
         .find(filter)
         .sort({ paymentTime: -1 })
         .toArray();
+      res.send(result);
+    });
+
+    // ! Review API
+    app.get("/reviews", async (req, res) => {
+      const result = await reviewCollection.find().toArray();
       res.send(result);
     });
 
