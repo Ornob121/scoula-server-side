@@ -124,22 +124,32 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/courses/instructors", verifyJWT, async (req, res) => {
-      const course = req.body;
-      // console.log(course);
-      const result = await courseCollection.insertOne(course);
-      res.send(result);
-    });
-
-    app.get("/courses/instructors", verifyJWT, async (req, res) => {
-      const email = req.query.email;
-      if (req.decoded.email !== email) {
-        res.status(401).send({ error: true, message: "unauthorized" });
+    app.post(
+      "/courses/instructors",
+      verifyJWT,
+      verifyTeacher,
+      async (req, res) => {
+        const course = req.body;
+        // console.log(course);
+        const result = await courseCollection.insertOne(course);
+        res.send(result);
       }
-      const filter = { instructorEmail: email };
-      const result = await courseCollection.find(filter).toArray();
-      res.send(result);
-    });
+    );
+
+    app.get(
+      "/courses/instructors",
+      verifyJWT,
+      verifyTeacher,
+      async (req, res) => {
+        const email = req.query.email;
+        if (req.decoded.email !== email) {
+          res.status(401).send({ error: true, message: "unauthorized" });
+        }
+        const filter = { instructorEmail: email };
+        const result = await courseCollection.find(filter).toArray();
+        res.send(result);
+      }
+    );
 
     app.get("/courses/instructors/:id", async (req, res) => {
       const id = req.params.id;
@@ -148,24 +158,29 @@ async function run() {
       res.send(result);
     });
 
-    app.patch("/courses/instructors/:id", verifyJWT, async (req, res) => {
-      const id = req.params.id;
-      const filter = { _id: new ObjectId(id) };
-      const updatedCourse = req.body;
-      const update = {
-        $set: {
-          courseName: updatedCourse.courseName,
-          image: updatedCourse.image,
-          instructorName: updatedCourse.instructorName,
-          instructorEmail: updatedCourse.instructorEmail,
-          status: updatedCourse.status,
-          availableSeats: updatedCourse.availableSeats,
-          coursePrice: updatedCourse.coursePrice,
-        },
-      };
-      const result = await courseCollection.updateMany(filter, update);
-      res.send(result);
-    });
+    app.patch(
+      "/courses/instructors/:id",
+      verifyJWT,
+      verifyTeacher,
+      async (req, res) => {
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) };
+        const updatedCourse = req.body;
+        const update = {
+          $set: {
+            courseName: updatedCourse.courseName,
+            image: updatedCourse.image,
+            instructorName: updatedCourse.instructorName,
+            instructorEmail: updatedCourse.instructorEmail,
+            status: updatedCourse.status,
+            availableSeats: updatedCourse.availableSeats,
+            coursePrice: updatedCourse.coursePrice,
+          },
+        };
+        const result = await courseCollection.updateMany(filter, update);
+        res.send(result);
+      }
+    );
 
     // ! Approve Class
     app.patch(
